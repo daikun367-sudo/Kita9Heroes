@@ -1,133 +1,361 @@
-<!DOCTYPE html>
-<html lang="en-us">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Unity Web Player | 北九州ヒーローズ</title>
-    <link rel="shortcut icon" href="TemplateData/favicon.ico">
-    <link rel="stylesheet" href="TemplateData/style.css">
-  </head>
-  <body>
-    <div id="unity-container" class="unity-desktop">
-      <canvas id="unity-canvas" width=960 height=600 tabindex="-1"></canvas>
-      <div id="unity-loading-bar">
-        <div id="unity-logo"></div>
-        <div id="unity-progress-bar-empty">
-          <div id="unity-progress-bar-full"></div>
-        </div>
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>北九州ヒーローズ ― 7つの街を救え！</title>
+<meta name="description" content="北九州市の7つの区をめぐって、けむりやヘドロのモンスターから街をすくう、キーボードで遊ぶ2DのRPG。ブラウザですぐに遊べます。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="北九州ヒーローズ ― 7つの街を救え！">
+<meta property="og:description" content="北九州市の7つの区をめぐる、ブラウザで遊べる2DのRPG。">
+<meta property="og:image" content="https://daikun367-sudo.github.io/Kita9Heroes/images/ogp.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="images/favicon-32.png">
+<link rel="apple-touch-icon" href="images/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky: #7cc4ec;
+    --sky-light: #e8f5fd;
+    --ink: #1d2b36;
+    --ink-soft: #4a5b68;
+    --window: #0f3f3e;
+    --window-line: #ffffff;
+    --gold: #ffd84d;
+    --gold-deep: #e8b923;
+    --card: #ffffff;
+    --pixel: "DotGothic16", "Hiragino Sans", sans-serif;
+    --body: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Hiragino Sans", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: var(--body);
+    font-weight: 500;
+    color: var(--ink);
+    background: var(--sky-light);
+    line-height: 2;
+    font-size: 17px;
+  }
+  rt { font-size: 0.5em; font-weight: 500; }
+  img, video { max-width: 100%; display: block; }
+  a { color: inherit; }
+
+  /* ---------- いちばん上 ---------- */
+  .hero {
+    background: linear-gradient(180deg, var(--sky) 0%, #aedcf5 70%, var(--sky-light) 100%);
+    padding: 28px 16px 56px;
+    text-align: center;
+  }
+  .hero-art {
+    max-width: 980px;
+    margin: 0 auto;
+    border: 4px solid var(--window-line);
+    outline: 4px solid var(--ink);
+    border-radius: 6px;
+    box-shadow: 0 12px 0 rgba(29, 43, 54, 0.18);
+    overflow: hidden;
+  }
+  .hero-art img { width: 100%; height: auto; }
+  .tagline {
+    font-family: var(--pixel);
+    font-size: clamp(20px, 3.2vw, 30px);
+    margin: 30px 0 8px;
+    letter-spacing: 0.04em;
+  }
+  .lead { margin: 0 auto 26px; max-width: 640px; color: var(--ink-soft); }
+
+  .play-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    font-family: var(--pixel);
+    font-size: clamp(22px, 3.4vw, 30px);
+    text-decoration: none;
+    color: var(--ink);
+    background: var(--gold);
+    border: 4px solid var(--ink);
+    border-radius: 6px;
+    padding: 14px 40px;
+    box-shadow: 0 7px 0 var(--ink);
+    transition: transform .08s, box-shadow .08s, background .15s;
+  }
+  .play-btn:hover { background: #ffe57e; }
+  .play-btn:active { transform: translateY(5px); box-shadow: 0 2px 0 var(--ink); }
+  .play-btn .arrow { font-size: 0.8em; }
+  .play-btn:focus-visible { outline: 4px solid #2a7fd4; outline-offset: 4px; }
+  .play-note { margin-top: 18px; font-size: 15px; color: var(--ink-soft); }
+
+  /* ---------- 本文 ---------- */
+  main { max-width: 980px; margin: 0 auto; padding: 0 16px 40px; }
+  section { margin: 56px 0; }
+  h2 {
+    font-family: var(--pixel);
+    font-weight: 400;
+    font-size: clamp(22px, 3vw, 28px);
+    margin: 0 0 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  h2::before { content: "▶"; font-size: 0.7em; color: var(--gold-deep); }
+
+  /* ゲームの 会話の 窓と おなじ 見た目 */
+  .window {
+    background: var(--window);
+    color: #fff;
+    border: 4px solid var(--window-line);
+    outline: 4px solid var(--ink);
+    border-radius: 6px;
+    padding: 22px 28px;
+    font-size: 18px;
+  }
+  .window p { margin: 0; }
+  .window p + p { margin-top: 10px; }
+
+  .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 18px;
+  }
+  .feature {
+    background: var(--card);
+    border: 3px solid var(--ink);
+    border-radius: 6px;
+    padding: 18px 20px 20px;
+  }
+  .feature h3 {
+    font-family: var(--pixel);
+    font-weight: 400;
+    font-size: 20px;
+    margin: 0 0 6px;
+    line-height: 1.8;
+  }
+  .feature p { margin: 0; color: var(--ink-soft); font-size: 16px; }
+
+  .wards {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; padding: 0; list-style: none;
+  }
+  .wards li {
+    font-family: var(--pixel);
+    background: var(--sky-light);
+    border: 2px solid var(--ink);
+    border-radius: 4px;
+    padding: 0 10px;
+    font-size: 15px;
+  }
+
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 14px;
+  }
+  .gallery figure { margin: 0; }
+  .gallery img {
+    width: 100%; height: auto;
+    border: 3px solid var(--ink);
+    border-radius: 6px;
+    aspect-ratio: 1200 / 659;
+    object-fit: cover;
+    background: #cfe7f5;
+  }
+  .gallery figcaption { font-size: 14px; color: var(--ink-soft); margin-top: 4px; line-height: 1.7; }
+
+  .video {
+    border: 4px solid var(--window-line);
+    outline: 4px solid var(--ink);
+    border-radius: 6px;
+    overflow: hidden;
+    background: #000;
+  }
+  .video video { width: 100%; height: auto; }
+
+  .keys { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
+  .keys th, .keys td { text-align: left; vertical-align: middle; padding: 4px 0; }
+  .keys th { width: 46%; font-weight: 500; }
+  kbd {
+    display: inline-block;
+    font-family: var(--pixel);
+    font-size: 15px;
+    min-width: 2.2em;
+    text-align: center;
+    padding: 0 8px;
+    margin: 0 3px 4px 0;
+    background: #fff;
+    color: var(--ink);
+    border: 2px solid var(--ink);
+    border-bottom-width: 4px;
+    border-radius: 5px;
+    line-height: 1.8;
+  }
+
+  .notes { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+  .notes li {
+    background: var(--card);
+    border: 3px solid var(--ink);
+    border-radius: 6px;
+    padding: 12px 18px 12px 52px;
+    position: relative;
+    font-size: 16px;
+  }
+  .notes li::before {
+    content: "！";
+    position: absolute; left: 16px; top: 12px;
+    font-family: var(--pixel);
+    color: var(--gold-deep);
+    font-size: 20px;
+  }
+  .notes b { font-weight: 700; }
+
+  .credits {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: 6px 22px;
+    margin: 0;
+  }
+  .credits dt { font-family: var(--pixel); color: var(--gold); }
+  .credits dd { margin: 0; min-width: 0; }
+
+  .again { text-align: center; margin: 64px 0 24px; }
+
+  footer {
+    text-align: center;
+    font-size: 14px;
+    color: var(--ink-soft);
+    padding: 24px 16px 40px;
+  }
+
+  @media (max-width: 640px) {
+    body { font-size: 16px; }
+    .window { padding: 18px 18px; font-size: 16px; }
+    .keys th { width: 52%; }
+    .credits { grid-template-columns: minmax(0, 1fr); gap: 0; }
+    .credits dd { margin-bottom: 10px; }
+    .play-btn { padding: 12px 26px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .play-btn { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-art">
+    <img src="images/hero.jpg" width="1600" height="900" alt="北九州ヒーローズ　7つの街を救え！ タイトル画面">
+  </div>
+  <p class="tagline"><ruby>北九州<rt>きたきゅうしゅう</rt></ruby>の<ruby>明日<rt>あした</rt></ruby>は、きっと<ruby>晴<rt>は</rt></ruby>れる。</p>
+  <p class="lead"><ruby>北九州市<rt>きたきゅうしゅうし</rt></ruby>の 7つの<ruby>区<rt>く</rt></ruby>を めぐって、<ruby>街<rt>まち</rt></ruby>を すくう 2DのRPG。<br>ブラウザで すぐに あそべます。</p>
+  <a class="play-btn" href="play/"><span class="arrow">▶</span>ゲームを プレイする</a>
+  <p class="play-note">パソコンで、キーボードを つかって あそびます。</p>
+</header>
+
+<main>
+
+  <section>
+    <h2>どんな ゲーム？</h2>
+    <div class="window">
+      <p>ある日、<ruby>北九州<rt>きたきゅうしゅう</rt></ruby>の <ruby>空<rt>そら</rt></ruby>が <ruby>灰色<rt>はいいろ</rt></ruby>の けむりに おおわれた。</p>
+      <p><ruby>海<rt>うみ</rt></ruby>には ヘドロ、<ruby>町<rt>まち</rt></ruby>には けむりの モンスター。<ruby>北九州<rt>きたきゅうしゅう</rt></ruby>の なかまたちと いっしょに、7つの<ruby>区<rt>く</rt></ruby>を すくいに <ruby>出<rt>で</rt></ruby>かけよう！</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>みどころ</h2>
+    <div class="features">
+      <div class="feature">
+        <h3>7つの<ruby>区<rt>く</rt></ruby>を めぐる <ruby>冒険<rt>ぼうけん</rt></ruby></h3>
+        <p><ruby>門司港<rt>もじこう</rt></ruby>レトロ、<ruby>平尾台<rt>ひらおだい</rt></ruby>の <ruby>鍾乳洞<rt>しょうにゅうどう</rt></ruby>、<ruby>皿倉山<rt>さらくらやま</rt></ruby>の <ruby>夜景<rt>やけい</rt></ruby>、<ruby>小倉城<rt>こくらじょう</rt></ruby>……。ほんものの <ruby>北九州<rt>きたきゅうしゅう</rt></ruby>を モデルに した <ruby>町<rt>まち</rt></ruby>を <ruby>歩<rt>ある</rt></ruby>けます。</p>
+        <ul class="wards">
+          <li><ruby>門司区<rt>もじく</rt></ruby></li><li><ruby>小倉南区<rt>こくらみなみく</rt></ruby></li><li><ruby>若松区<rt>わかまつく</rt></ruby></li><li><ruby>八幡西区<rt>やはたにしく</rt></ruby></li><li><ruby>八幡東区<rt>やはたひがしく</rt></ruby></li><li><ruby>戸畑区<rt>とばたく</rt></ruby></li><li><ruby>小倉北区<rt>こくらきたく</rt></ruby></li>
+        </ul>
       </div>
-      <div id="unity-warning"> </div>
-      <div id="unity-footer">
-        <div id="unity-logo-title-footer"></div>
-        <div id="unity-fullscreen-button"></div>
-        <div id="unity-build-title">北九州ヒーローズ</div>
+      <div class="feature">
+        <h3>なかまと いっしょに <ruby>戦<rt>たたか</rt></ruby>う</h3>
+        <p><ruby>北九州<rt>きたきゅうしゅう</rt></ruby>の キャラクターたちが なかまに なります。モンスターは たおすのでは なく、「じょうか」して もとの すがたに もどします。</p>
+      </div>
+      <div class="feature">
+        <h3><ruby>区<rt>く</rt></ruby>ごとの ミニゲーム</h3>
+        <p>ちょうちん<ruby>積<rt>つ</rt></ruby>み、ケーブルカーの シューティング、<ruby>太鼓<rt>たいこ</rt></ruby>の リズム、さいごの <ruby>弾幕<rt>だんまく</rt></ruby>バトル。<ruby>区<rt>く</rt></ruby>ごとに ちがう あそびが まっています。</p>
+      </div>
+      <div class="feature">
+        <h3><ruby>名物<rt>めいぶつ</rt></ruby>と まめちしき</h3>
+        <p><ruby>売店<rt>ばいてん</rt></ruby>では <ruby>区<rt>く</rt></ruby>ごとの <ruby>名物<rt>めいぶつ</rt></ruby>を <ruby>買<rt>か</rt></ruby>えます。<ruby>漢字<rt>かんじ</rt></ruby>には ぜんぶ ふりがなが ついているので、<ruby>小学生<rt>しょうがくせい</rt></ruby>でも <ruby>読<rt>よ</rt></ruby>めます。</p>
       </div>
     </div>
-    <script>
-      var canvas = document.querySelector("#unity-canvas");
+  </section>
 
-      // Shows a temporary message banner/ribbon for a few seconds, or
-      // a permanent error message on top of the canvas if type=='error'.
-      // If type=='warning', a yellow highlight color is used.
-      // Modify or remove this function to customize the visually presented
-      // way that non-critical warnings and error messages are presented to the
-      // user.
-      function unityShowBanner(msg, type) {
-        var warningBanner = document.querySelector("#unity-warning");
-        function updateBannerVisibility() {
-          warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
-        }
-        var div = document.createElement('div');
-        div.innerHTML = msg;
-        warningBanner.appendChild(div);
-        if (type == 'error') div.style = 'background: red; padding: 10px;';
-        else {
-          if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
-          setTimeout(function() {
-            warningBanner.removeChild(div);
-            updateBannerVisibility();
-          }, 5000);
-        }
-        updateBannerVisibility();
-      }
+  <section>
+    <h2>スクリーンショット</h2>
+    <div class="gallery">
+      <figure><img src="images/shot1.jpg" width="1200" height="659" loading="lazy" alt="八幡西区・木屋瀬の宿場町を歩く場面"><figcaption><ruby>八幡西区<rt>やはたにしく</rt></ruby>・<ruby>木屋瀬<rt>こやのせ</rt></ruby>の <ruby>宿場町<rt>しゅくばまち</rt></ruby></figcaption></figure>
+      <figure><img src="images/shot2.jpg" width="1200" height="659" loading="lazy" alt="ヘドロクラーケンとの戦闘画面"><figcaption>ヘドロクラーケンとの バトル</figcaption></figure>
+      <figure><img src="images/shot3.jpg" width="1200" height="659" loading="lazy" alt="皿倉山の展望台で夜景を見る場面"><figcaption><ruby>皿倉山<rt>さらくらやま</rt></ruby>の <ruby>展望台<rt>てんぼうだい</rt></ruby></figcaption></figure>
+      <figure><img src="images/shot4.jpg" width="1200" height="659" loading="lazy" alt="ちょうちん積みのミニゲーム"><figcaption>ミニゲーム「ちょうちん<ruby>積<rt>つ</rt></ruby>み」</figcaption></figure>
+      <figure><img src="images/shot5.jpg" width="1200" height="659" loading="lazy" alt="さいごの弾幕シューティング"><figcaption>さいごの たたかい</figcaption></figure>
+    </div>
+  </section>
 
-      var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/KitakyushuHeroes_Web.loader.js";
-      var config = {
-        arguments: [],
-        dataUrl: buildUrl + "/KitakyushuHeroes_Web.data.unityweb",
-        frameworkUrl: buildUrl + "/KitakyushuHeroes_Web.framework.js.unityweb",
-        codeUrl: buildUrl + "/KitakyushuHeroes_Web.wasm.unityweb",
-        streamingAssetsUrl: "StreamingAssets",
-        companyName: "DefaultCompany",
-        productName: "北九州ヒーローズ",
-        productVersion: "1.0",
-        showBanner: unityShowBanner,
-        // errorHandler: function(err, url, line) {
-        //    alert("error " + err + " occurred at line " + line);
-        //    // Return 'true' if you handled this error and don't want Unity
-        //    // to process it further, 'false' otherwise.
-        //    return true;
-        // },
-      };
+  <section>
+    <h2>トレーラー</h2>
+    <div class="video">
+      <video controls preload="none" playsinline poster="images/trailer-poster.jpg" width="1920" height="1080">
+        <source src="images/trailer.mp4" type="video/mp4">
+      </video>
+    </div>
+  </section>
 
-      // By default, Unity keeps WebGL canvas render target size matched with
-      // the DOM size of the canvas element (scaled by window.devicePixelRatio)
-      // Set this to false if you want to decouple this synchronization from
-      // happening inside the engine, and you would instead like to size up
-      // the canvas DOM size and WebGL render target sizes yourself.
-      // config.matchWebGLToCanvasSize = false;
+  <section>
+    <h2>あそびかた</h2>
+    <div class="window">
+      <table class="keys">
+        <tr><th><kbd>←</kbd><kbd>↑</kbd><kbd>↓</kbd><kbd>→</kbd> / <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></th><td><ruby>歩<rt>ある</rt></ruby>く・えらぶ</td></tr>
+        <tr><th><kbd>Z</kbd> / <kbd>Enter</kbd></th><td><ruby>話<rt>はな</rt></ruby>す・<ruby>調<rt>しら</rt></ruby>べる・<ruby>決定<rt>けってい</rt></ruby></td></tr>
+        <tr><th><kbd>X</kbd></th><td>メニュー・もどる</td></tr>
+        <tr><th><kbd>Tab</kbd></th><td><ruby>地図<rt>ちず</rt></ruby></td></tr>
+        <tr><th><kbd>Esc</kbd></th><td><ruby>北九州<rt>きたきゅうしゅう</rt></ruby>マップへ もどる</td></tr>
+      </table>
+    </div>
+  </section>
 
-      // If you would like all file writes inside Unity Application.persistentDataPath
-      // directory to automatically persist so that the contents are remembered when
-      // the user revisits the site the next time, uncomment the following line:
-      // config.autoSyncPersistentDataPath = true;
-      // This autosyncing is currently not the default behavior to avoid regressing
-      // existing user projects that might rely on the earlier manual
-      // JS_FileSystem_Sync() behavior, but in future Unity version, this will be
-      // expected to change.
+  <section>
+    <h2>あそぶ <ruby>前<rt>まえ</rt></ruby>に</h2>
+    <ul class="notes">
+      <li><b><ruby>日本語入力<rt>にほんごにゅうりょく</rt></ruby>を「<ruby>英数<rt>えいすう</rt></ruby>」に して ください。</b>ひらがな<ruby>入力<rt>にゅうりょく</rt></ruby>の ままだと、キーが きかないことが あります。</li>
+      <li>ゲームが <ruby>始<rt>はじ</rt></ruby>まったら、<b><ruby>画面<rt>がめん</rt></ruby>を 1<ruby>回<rt>かい</rt></ruby> クリック</b> してから あそんでください。<ruby>音<rt>おと</rt></ruby>も そこから <ruby>鳴<rt>な</rt></ruby>ります。</li>
+      <li><ruby>最初<rt>さいしょ</rt></ruby>の <ruby>読<rt>よ</rt></ruby>みこみに すこし <ruby>時間<rt>じかん</rt></ruby>が かかります（<ruby>約<rt>やく</rt></ruby>100MB）。2<ruby>回<rt>かい</rt></ruby><ruby>目<rt>め</rt></ruby>からは <ruby>速<rt>はや</rt></ruby>くなります。</li>
+      <li>セーブは この ブラウザの <ruby>中<rt>なか</rt></ruby>に のこります。ブラウザの <ruby>履歴<rt>りれき</rt></ruby>を <ruby>消<rt>け</rt></ruby>したときや、シークレットモードでは <ruby>消<rt>き</rt></ruby>えてしまいます。<br>セーブすると でる <b>「ふっかつのじゅもん」</b>を メモして おけば、タイトルから つづきを <ruby>始<rt>はじ</rt></ruby>められます。</li>
+      <li>スマホや タブレットでは あそべません。パソコンで あそんでね。</li>
+    </ul>
+  </section>
 
-      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        // Mobile device style: fill the whole browser client area with the game canvas:
+  <section>
+    <h2>クレジット</h2>
+    <div class="window">
+      <dl class="credits">
+        <dt><ruby>舞台<rt>ぶたい</rt></ruby></dt><dd><ruby>門司区<rt>もじく</rt></ruby>・<wbr><ruby>小倉南区<rt>こくらみなみく</rt></ruby>・<wbr><ruby>若松区<rt>わかまつく</rt></ruby>・<wbr><ruby>八幡西区<rt>やはたにしく</rt></ruby>・<wbr><ruby>八幡東区<rt>やはたひがしく</rt></ruby>・<wbr><ruby>戸畑区<rt>とばたく</rt></ruby>・<wbr><ruby>小倉北区<rt>こくらきたく</rt></ruby></dd>
+        <dt><ruby>絵<rt>え</rt></ruby></dt><dd>ChatGPT</dd>
+        <dt>フィールド</dt><dd>Codex</dd>
+        <dt>プログラム<ruby>効率化<rt>こうりつか</rt></ruby></dt><dd>Claude</dd>
+        <dt><ruby>音楽<rt>おんがく</rt></ruby></dt><dd>Suno</dd>
+        <dt>スペシャルサンクス</dt><dd>キャラクター<ruby>関係者<rt>かんけいしゃ</rt></ruby>の みなさん</dd>
+      </dl>
+    </div>
+  </section>
 
-        var meta = document.createElement('meta');
-        meta.name = 'viewport';
-        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
-        document.getElementsByTagName('head')[0].appendChild(meta);
-        document.querySelector("#unity-container").className = "unity-mobile";
-        canvas.className = "unity-mobile";
+  <div class="again">
+    <a class="play-btn" href="play/"><span class="arrow">▶</span>ゲームを プレイする</a>
+  </div>
 
-        // To lower canvas resolution on mobile devices to gain some
-        // performance, uncomment the following line:
-        // config.devicePixelRatio = 1;
+</main>
 
+<footer>
+  <p>© 2026 <ruby>北九州<rt>きたきゅうしゅう</rt></ruby>ヒーローズ</p>
+</footer>
 
-      } else {
-        // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
-        canvas.style.width = "960px";
-        canvas.style.height = "600px";
-      }
-
-      document.querySelector("#unity-loading-bar").style.display = "block";
-
-      var script = document.createElement("script");
-      script.src = loaderUrl;
-      script.onload = () => {
-        createUnityInstance(canvas, config, (progress) => {
-          document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
-              }).then((unityInstance) => {
-                document.querySelector("#unity-loading-bar").style.display = "none";
-                document.querySelector("#unity-fullscreen-button").onclick = () => {
-                  unityInstance.SetFullscreen(1);
-                };
-
-              }).catch((message) => {
-                alert(message);
-              });
-            };
-
-      document.body.appendChild(script);
-
-    </script>
-  </body>
+</body>
 </html>
